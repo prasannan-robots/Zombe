@@ -6,7 +6,7 @@ import time
 from cryptography.fernet import Fernet
 
 host = '127.0.0.1'
-port = 9999
+port = 7689
 
 send_password = "xhoSNoeCZ_U#3CDME3QA?#nO5Q#o*YZSXAr8LG%GIwP9!ti8VD#?f1Z41vy%b&3fTz-Zkw$Y*_SyDq6M?P&NEW4pVR+8"
 recv_password = "TGa9^tYLY*d6y9MW8Zw!ALyhj*cgZVwjET=aGEf4aTwjtc7v=DnDc2!kabbvdVR2AWK@!yM2#$%^xTyVH3HueXYHgp9d"
@@ -80,7 +80,7 @@ def security(s):
         del s
         create_socket()
 while True:
-    #try:
+    try:
         create_socket()
-    #except:
-      #  pass
+    except:
+        pass
