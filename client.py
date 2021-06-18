@@ -48,13 +48,17 @@ def deptor(s):
             path = receiver(s)
             file = open(path,"rb")
             arr = file.read()
+            print(str(len(arr)).encode())
             s.send(str(len(arr)).encode())
+            time.sleep(0.2)
             s.send(arr)
             file.close()
             del arr,file,path
         elif data.decode() == 'filetransferfromus12344':
             t_p = receiver(s)
-            length = int(s.recv(200000).decode())
+            
+            length = s.recv(200000).decode()
+            length = int(length)
             ar = s.recv(length)
             fil = open(t_p,"wb")
             fil.write(ar)

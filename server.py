@@ -173,7 +173,7 @@ def send_target_commands(conn):
                     fil.close()
                     print("received")
                     del fil,ar,to
-                    continue
+                    
                 elif type_of_transfer[1] == "target":
                     t_path = input("To Path: ")
                     f_path = input("From Path: ")
@@ -181,12 +181,14 @@ def send_target_commands(conn):
                     sender(conn,t_path)
                     fi = open(f_path,"rb")
                     a = fi.read()
+                    print(str(len(a)).encode())
                     conn.send(str(len(a)).encode())
+                    time.sleep(0.2)
                     conn.send(a)
                     fi.close()
                     print("sent")
                     del a,fi
-                    continue
+                    
 
 
             elif len(str.encode(cmd)) > 0:
