@@ -31,7 +31,6 @@ def receiver(conn):
     data = conn.recv(data_len)
     data = decryptor.decrypt(data).decode()
     del data_len,decryptor
-    print(data)
     return data
 # Create a Socket ( connect two computers)
 def create_socket():
