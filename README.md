@@ -60,6 +60,6 @@ exitu
 <br>
 
 # Credits
-## Made - Prasanna.N
-## Contact - prasannan.herokuapp.com
-## Some code from a youtube channel guy
+### Made - Prasanna.N
+### Contact - prasannan.herokuapp.com
+### Some code from a youtube channel guy
