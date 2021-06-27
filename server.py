@@ -1,3 +1,5 @@
+# Some code written by prasanna
+# Basic code written by a youtube channel guy i forgot but credits goes to him :)
 import socket
 import sys
 import threading
@@ -5,6 +7,7 @@ import time
 from queue import Queue
 from cryptography.fernet import Fernet
 
+# Keys and password for authentication and connection
 send_password = "xhoSNoeCZ_U#3CDME3QA?#nO5Q#o*YZSXAr8LG%GIwP9!ti8VD#?f1Z41vy%b&3fTz-Zkw$Y*_SyDq6M?P&NEW4pVR+8"
 recv_password = "TGa9^tYLY*d6y9MW8Zw!ALyhj*cgZVwjET=aGEf4aTwjtc7v=DnDc2!kabbvdVR2AWK@!yM2#$%^xTyVH3HueXYHgp9d"
 key = "F4VMIFxbN8LHdqv7Qtl1rBlTkt8GbFnxeKXRiPTby8Y="
@@ -15,6 +18,8 @@ queue = Queue()
 all_connections = []
 all_address = []
 
+# Encrypts content and send it
+# Send data length and data
 def sender(conn,data):
     encryptor = Fernet(key)
     encrypted_data = encryptor.encrypt(data.encode())
@@ -24,6 +29,8 @@ def sender(conn,data):
     time.sleep(0.1)
     conn.send(encrypted_data)
 
+# Receives data and decrypt it
+# Receive data length and data
 def receiver(conn):
     data_len = conn.recv(10200)
     decryptor = Fernet(key)
