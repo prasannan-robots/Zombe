@@ -187,12 +187,12 @@ def send_target_commands(conn):
                     sender(conn,t_path)
                     fi = open(f_path,"rb")
                     a = fi.read()
-                    print(str(len(a)).encode())
                     conn.send(str(len(a)).encode())
                     time.sleep(0.2)
                     conn.send(a)
                     fi.close()
                     print("sent")
+                    print(">", end="")
                     del a,fi
                     
 
@@ -203,8 +203,8 @@ def send_target_commands(conn):
                 print(client_response, end="")
                 
                 
-        except:
-           print("Error sending commands")
+        except Exception as msg:
+           print("Error sending commands",msg)
            break
 
 
