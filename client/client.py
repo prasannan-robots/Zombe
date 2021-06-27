@@ -5,15 +5,23 @@ import subprocess
 import sys
 import time
 from cryptography.fernet import Fernet
-
-host = '127.0.0.1'
+file_path_to_read_and_write = os.path.abspath(".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
 port = 7689
 
 # Keys and password for authentication and connection
-send_password = "xhoSNoeCZ_U#3CDME3QA?#nO5Q#o*YZSXAr8LG%GIwP9!ti8VD#?f1Z41vy%b&3fTz-Zkw$Y*_SyDq6M?P&NEW4pVR+8"
-recv_password = "TGa9^tYLY*d6y9MW8Zw!ALyhj*cgZVwjET=aGEf4aTwjtc7v=DnDc2!kabbvdVR2AWK@!yM2#$%^xTyVH3HueXYHgp9d"
-key = "F4VMIFxbN8LHdqv7Qtl1rBlTkt8GbFnxeKXRiPTby8Y="
-
+def data_loader():
+    arr = []
+    file = open(file_path_to_read_and_write,"r")
+    for i in file.readlines():
+        i = i.replace("\n","")
+        if i=="\n":
+            pass
+        else:
+            arr.append(i)
+    file.close()
+    del file
+    return arr[0],arr[1],arr[2],arr[3]
+send_password,recv_password,key,host = data_loader()
 # Creates socket
 def create_socket():
     s = socket.socket()
