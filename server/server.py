@@ -2,15 +2,26 @@
 # Basic code written by a youtube channel guy i forgot but credits goes to him :)
 import socket
 import sys
+import os
 import threading
 import time
 from queue import Queue
 from cryptography.fernet import Fernet
-
+file_path_to_read_and_write = os.path.abspath(".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
 # Keys and password for authentication and connection
-send_password = "xhoSNoeCZ_U#3CDME3QA?#nO5Q#o*YZSXAr8LG%GIwP9!ti8VD#?f1Z41vy%b&3fTz-Zkw$Y*_SyDq6M?P&NEW4pVR+8"
-recv_password = "TGa9^tYLY*d6y9MW8Zw!ALyhj*cgZVwjET=aGEf4aTwjtc7v=DnDc2!kabbvdVR2AWK@!yM2#$%^xTyVH3HueXYHgp9d"
-key = "F4VMIFxbN8LHdqv7Qtl1rBlTkt8GbFnxeKXRiPTby8Y="
+def data_loader():
+    arr = []
+    file = open(file_path_to_read_and_write,"r")
+    for i in file.readlines():
+        i = i.replace("\n","")
+        if i=="\n":
+            pass
+        else:
+            arr.append(i)
+    file.close()
+    del file
+    return arr[0],arr[1],arr[2]
+send_password,recv_password,key = data_loader()
 
 NUMBER_OF_THREADS = 2
 JOB_NUMBER = [1, 2]
