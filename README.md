@@ -10,6 +10,9 @@
 ```
 git clone https://github.com/prasannan-robots/Zombe.git
 ```
+```
+cd Zombe
+```
 <br>
 
 ## Step2:Installing dependencies
