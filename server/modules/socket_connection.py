@@ -1,7 +1,7 @@
 # need to import tools send_password and recv_password
 import socket
 from cryptography.fernet import Fernet
-import tools
+import modules.tools as tools
 import os
 import threading
 # Socket tools class which is used as an object.

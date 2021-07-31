@@ -6,10 +6,10 @@ import os
 import threading
 import time
 from queue import Queue
-import socket_connection as sc
+import modules.socket_connection as sc
 
-normal_clients = sc.socket_tools("0.0.0.0",1025,".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
-sudo_user = sc.socket_tools("0.0.0.0",1026,".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
+normal_clients = sc.socket_tools("0.0.0.0",1025,"data.DAT")
+sudo_user = sc.socket_tools("0.0.0.0",1026,"data.DAT")
 
 def send_data_target(ser):
     def start_turtle(ser):

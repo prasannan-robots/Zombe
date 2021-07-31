@@ -92,6 +92,6 @@ def create_password():
 ssend_password = create_password()
 rrecv_password = create_password()
 key = Fernet.generate_key()
-key_changer(ssend_password,rrecv_password,key,"server/.0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
+key_changer(ssend_password,rrecv_password,key,"server/data.DAT")
 key_changer1(ssend_password,rrecv_password,key,ip,"client/.0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
 print("...Setup Done...")
