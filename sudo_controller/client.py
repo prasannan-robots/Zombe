@@ -5,7 +5,7 @@ import subprocess
 import sys
 import time
 from cryptography.fernet import Fernet
-file_path_to_read_and_write = os.path.abspath(".0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
+file_path_to_read_and_write = os.path.abspath("data.DAT")
 port = 1026
 
 # Keys and password for authentication and connection
@@ -56,10 +56,10 @@ def receiver(conn):
 def deptor(s):
     print("Starting ...")
     while True:
-        data = input(">")
+        data = input()
         if len(data) > 0:
             sender(s,data)
-            print(receiver(s))
+            print(receiver(s),end="")
 
 # Security check for authentication
 def security(s):
