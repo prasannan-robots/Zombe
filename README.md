@@ -1,10 +1,10 @@
 # Zombe
-## Encrypted Remote access and file transfer
+ Encrypted Remote access and file transfer
 <br>
 <br>
 
 # Installation
-## Step1:Git clone
+ Step1:Git clone
 <br>
 
 ```
@@ -15,7 +15,7 @@ cd Zombe
 ```
 <br>
 
-## Step2:Installing dependencies
+Step2:Installing dependencies
 <br>
 
 ```
@@ -24,7 +24,7 @@ pip3 install -r requirements.txt
 
 <br>
 
-## Step3:Run configure .py
+Step3:Run configure .py
 <br>
 
 ```
@@ -63,8 +63,6 @@ exitu
 <br>
 
 # Credits
-### Made - Prasanna.N
-### Contact - prasannan.herokuapp.com
 ### Some code from a youtube channel guy
 
 # Feel free to edit and make your version
