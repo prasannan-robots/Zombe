@@ -7,6 +7,7 @@ import threading
 import time
 from queue import Queue
 import modules.socket_connection as sc
+from modules.client_objects import clients
 
 normal_clients = sc.socket_tools("0.0.0.0",1025,"data.DAT")
 sudo_user = sc.socket_tools("0.0.0.0",1026,"data.DAT")
@@ -36,17 +37,16 @@ def send_data_target(ser):
     def list_connections(ser):
         results = ' '
 
-        for i, conn in enumerate(normal_clients.all_connections):
+        for i, conn in enumerate(normal_clients.array_of_client_objects):
             try:
                 normal_clients.sender(conn,' ')
                 normal_clients.receiver(conn)
             except:
-                del normal_clients.all_connections[i]
-                del normal_clients.all_address[i]
+                del normal_clients.array_of_client_objects[i]
                 continue
 
             
-            results = str(i) + "   " + str(normal_clients.all_address[i][0]) + "   " + str(normal_clients.all_address[i][1]) + "\n"
+            results = str(i) + "   " + str(normal_clients.array_of_client_objects[i].address) + "\n"
         #print(results)
         sudo_user.sender(ser, results)
         
@@ -57,7 +57,7 @@ def send_data_target(ser):
         try:
             target = cmd.replace('select ', '')  # target = id
             target = int(target)
-            conn = normal_clients.all_connections[target]
+            conn = normal_clients.array_of_client_objects[target]
             sudo_user.sender(ser,"Selected")
             #print("You are now connected to :" + str(normal_clients.all_address[target][0]))
             #print(str(all_address[target][0]) + ">", end="")
@@ -138,7 +138,7 @@ finished_conn = []
 print("D: Starting thread to create threads for sudo controllers")
 while True:
     try:
-        for i in sudo_user.all_connections:
+        for i in sudo_user.array_of_client_objects:
             if not i in finished_conn:
                 finished_conn.append(i)
                 data_s = threading.Thread(target=send_data_target,args=(i,))

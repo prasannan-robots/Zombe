@@ -1,7 +1,7 @@
 # need to import tools send_password and recv_password
 import socket
-from cryptography.fernet import Fernet
-import modules.tools as tools
+import rsa
+from modules.tools import clients,data_loader
 import os, sys, time
 import threading
 # Socket tools class which is used as an object.
@@ -11,12 +11,11 @@ class socket_tools:
     def __init__(self,host,port,file_path_to_read_and_write):
         self.host = host
         self.port = port
-        self.all_connections = []
-        self.all_address = []
+        self.array_of_client_objects = []
         self.file_path_to_read_and_write = os.path.abspath(file_path_to_read_and_write)
         self.s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.bind_socket()
-        self.send_password, self.recv_password, self.key = tools.tool.data_loader(file_path_to_read_and_write)
+        self.public_key_server, self.private_key, self.recv_password = data_loader(file_path_to_read_and_write)
         
     
     # this binds the socket
@@ -30,22 +29,20 @@ class socket_tools:
 
     # To accept connections and append to list
     def accepting_connections(self):
-        for c in self.all_connections:
+        for c in self.array_of_client_objects:
+            c = c.connection
             c.close()
 
-        del self.all_connections[:]
-        del self.all_address[:]
+        del self.array_of_client_objects[:]
 
         while True:
             try:
                 conn, address = self.s.accept()
                 self.s.setblocking(1)  # prevents timeout
-                received_password_from_client = self.receiver(conn)
-                if received_password_from_client == self.send_password:
-                    self.sender(conn,self.recv_password)
-                self.all_connections.append(conn)
-                self.all_address.append(address)
-
+                public_key = self.receiver(conn)
+                self.sender(conn,self.send_password)
+                client_obj = clients(conn,address,public_key)
+                self.array_of_client_objects.append(client_obj)
                 print("D: Connection has been established :" + address[0])
 
             except Exception as msg:
@@ -55,22 +52,20 @@ class socket_tools:
     # Encrypts content and send it
     # Send data length and data
     def sender(self,conn,data):
-        encryptor = Fernet(self.key)
-        encrypted_data = encryptor.encrypt(data.encode())
+        encrypted_data = rsa.encrypt(data.encode(),self.public_key)
         encrypted_data_len = str(sys.getsizeof(encrypted_data.decode()))
-        encrypted_data_len = encryptor.encrypt(encrypted_data_len.encode())
-        conn.send(encrypted_data_len)
+        encrypted_data_len = rsa.encrypt(encrypted_data_len.encode())
+        conn.connection.send(encrypted_data_len)
         time.sleep(0.1)
-        conn.send(encrypted_data)
+        conn.connection.send(encrypted_data)
 
 
     # Receives data and decrypt it
     # Receive data length and data
     def receiver(self,conn):
-        data_len = conn.recv(10200)
-        decryptor = Fernet(self.key)
-        data_len = int(decryptor.decrypt(data_len).decode())
-        data = conn.recv(data_len)
-        data = decryptor.decrypt(data).decode()
-        del data_len,decryptor
+        data_len = conn.connection.recv(10200)
+        data_len = int(rsa.decrypt(data_len,self.private_key).decode())
+        data = conn.connection.recv(data_len)
+        data = rsa.decrypt(data,self.private_key).decode()
+        del data_len
         return data

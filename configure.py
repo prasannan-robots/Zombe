@@ -1,4 +1,4 @@
-from cryptography.fernet import Fernet
+import rsa
 from requests import get
 
 
@@ -6,27 +6,27 @@ ip = input("Do you want to use your ip address for client connection[Y/N]:")
 if ip == 'Y':
     ip = get('https://api.ipify.org').text
 else:
-    ip = input("Enter ip address: ")
-def key_changer(send_password,receive_password,key,file_path_to_read_and_write):
+    ip = input("Enter custom ip address: ")
+    
+def key_changer_server(public_key_server,private_key,recv_password,file_path_to_read_and_write):
     
             file=open(file_path_to_read_and_write,"w")
-            file.write(send_password)
+            file.write(public_key_server.decode())
             file.write("\n")
-            file.write(receive_password)
+            file.write(private_key.decode())
             file.write("\n")
-            file.write(key.decode())
+            file.write(recv_password)
             file.close()
             del file
-def key_changer1(send_password,receive_password,key,ip,file_path_to_read_and_write):
+
+def key_changer_clients(public_key_server,host,recv_password,file_path_to_read_and_write):
     
             file=open(file_path_to_read_and_write,"w")
-            file.write(send_password)
+            file.write(public_key_server.decode())
             file.write("\n")
-            file.write(receive_password)
+            file.write(host)
             file.write("\n")
-            file.write(key.decode())
-            file.write("\n")
-            file.write(ip)
+            file.write(recv_password)
             file.close()
             del file
 def create_password():
@@ -89,10 +89,12 @@ def create_password():
     return password
     # print out password
 
-ssend_password = create_password()
+
 rrecv_password = create_password()
-key = Fernet.generate_key()
-key_changer(ssend_password,rrecv_password,key,"server/data.DAT")
-key_changer1(ssend_password,rrecv_password,key,ip,"client/.0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one")
-key_changer1(ssend_password,rrecv_password,key,ip,"sudo_controller/data.DAT")
-print("...Setup Done...")
+print("Creating rsa keys ...This takes some time")
+(public_key_server, private_key_server) = rsa.newkeys(2048)
+print("Writing changes ....")
+key_changer_server(public_key_server,private_key_server,rrecv_password,"server/data.DAT")
+key_changer_clients(public_key_server,ip,rrecv_password,"client/.data.one")
+key_changer_clients(public_key_server,ip,rrecv_password,"sudo_controller/data.DAT")
+input("...Setup Done...")
