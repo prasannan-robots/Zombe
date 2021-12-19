@@ -7,7 +7,8 @@ import threading
 import time
 from queue import Queue
 import modules.socket_connection as sc
-from modules.client_objects import clients
+from modules.tools import clients
+
 
 normal_clients = sc.socket_tools("0.0.0.0",1025,"data.DAT")
 sudo_user = sc.socket_tools("0.0.0.0",1026,"data.DAT")
@@ -42,7 +43,7 @@ def send_data_target(ser):
                 normal_clients.sender(conn,' ')
                 normal_clients.receiver(conn)
             except:
-                del normal_clients.array_of_client_objects[i]
+                normal_clients.remove_client(i)
                 continue
 
             

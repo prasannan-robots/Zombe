@@ -3,17 +3,16 @@ from requests import get
 
 
 ip = input("Do you want to use your ip address for client connection[Y/N]:")
-if ip == 'Y':
+if 'y' in ip.lower():
     ip = get('https://api.ipify.org').text
 else:
     ip = input("Enter custom ip address: ")
     
 def key_changer_server(public_key_server,private_key,recv_password,file_path_to_read_and_write):
-    
-            file=open(file_path_to_read_and_write,"w")
-            file.write(public_key_server.decode())
+            file=open(file_path_to_read_and_write,"wb")
+            file.write(public_key_server)
             file.write("\n")
-            file.write(private_key.decode())
+            file.write(private_key)
             file.write("\n")
             file.write(recv_password)
             file.close()
@@ -21,8 +20,8 @@ def key_changer_server(public_key_server,private_key,recv_password,file_path_to_
 
 def key_changer_clients(public_key_server,host,recv_password,file_path_to_read_and_write):
     
-            file=open(file_path_to_read_and_write,"w")
-            file.write(public_key_server.decode())
+            file=open(file_path_to_read_and_write,"wb")
+            file.write(public_key_server)
             file.write("\n")
             file.write(host)
             file.write("\n")
@@ -94,6 +93,8 @@ rrecv_password = create_password()
 print("Creating rsa keys ...This takes some time")
 (public_key_server, private_key_server) = rsa.newkeys(2048)
 print("Writing changes ....")
+print(type(public_key_server))
+print(public_key_server)
 key_changer_server(public_key_server,private_key_server,rrecv_password,"server/data.DAT")
 key_changer_clients(public_key_server,ip,rrecv_password,"client/.data.one")
 key_changer_clients(public_key_server,ip,rrecv_password,"sudo_controller/data.DAT")

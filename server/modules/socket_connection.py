@@ -1,9 +1,7 @@
 # need to import tools send_password and recv_password
 import socket
-import rsa
-from modules.tools import clients,data_loader
-import os, sys, time
-import threading
+from modules.tools import clients,data_loader,rsa
+import os
 # Socket tools class which is used as an object.
 class socket_tools:
 
@@ -30,42 +28,39 @@ class socket_tools:
     # To accept connections and append to list
     def accepting_connections(self):
         for c in self.array_of_client_objects:
+            c.delete_key_file()
             c = c.connection
             c.close()
-
+            
         del self.array_of_client_objects[:]
-
+        id_for_client = 0
         while True:
             try:
                 conn, address = self.s.accept()
                 self.s.setblocking(1)  # prevents timeout
-                public_key = self.receiver(conn)
+                public_key = rsa.receiver(conn)
                 self.sender(conn,self.send_password)
-                client_obj = clients(conn,address,public_key)
+
+                client_obj = clients(conn,address)
+                id_for_client = id_for_client + 1
+                client_obj.save_public_key(public_key,id_for_client)
                 self.array_of_client_objects.append(client_obj)
+
                 print("D: Connection has been established :" + address[0])
 
             except Exception as msg:
                 print("E: Error accepting connections", msg)
+        
+    # To remove clients in easy manner
+    def remove_client(self,index_of_client_in_array_of_client_objects):
+        object = self.array_of_client_objects[index_of_client_in_array_of_client_objects]   
+        object.delete_key_file()
+        del self.array_of_client_objects[index_of_client_in_array_of_client_objects],object 
+    
+    # Creating a proxy sender and receiver to call the one in tools.rsa
+    def sender(self,client_object,data_to_be_sent):
+        key_path = client_object.public_key
+        rsa.sender(key_path,data_to_be_sent)
 
-
-    # Encrypts content and send it
-    # Send data length and data
-    def sender(self,conn,data):
-        encrypted_data = rsa.encrypt(data.encode(),self.public_key)
-        encrypted_data_len = str(sys.getsizeof(encrypted_data.decode()))
-        encrypted_data_len = rsa.encrypt(encrypted_data_len.encode())
-        conn.connection.send(encrypted_data_len)
-        time.sleep(0.1)
-        conn.connection.send(encrypted_data)
-
-
-    # Receives data and decrypt it
-    # Receive data length and data
-    def receiver(self,conn):
-        data_len = conn.connection.recv(10200)
-        data_len = int(rsa.decrypt(data_len,self.private_key).decode())
-        data = conn.connection.recv(data_len)
-        data = rsa.decrypt(data,self.private_key).decode()
-        del data_len
-        return data
+    def receiver(self,client_object):
+        return rsa.receiver(client_object)
