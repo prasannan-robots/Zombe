@@ -46,16 +46,13 @@ class clients:
 # To Manage encryption and decryption
 
 class rsa:
-    def __init__(self):
-        pass
 
     # To encrypt and decrypt using rsa opencryptdome
     # Uses a file to save the incoming data and opening it and decrypting it
     # All public_key of the clients are stored in file with unique no 
     def encrypt(data,public_key):
-        file_out = open("./temp/encrypted_data.bin", "wb")
-
-        recipient_key = RSA.import_key(open("./temp/receiver.pem").read())
+        result_array = [] # To store results in this array
+        recipient_key = RSA.import_key(open(public_key).read())
         session_key = get_random_bytes(16)
 
         # Encrypt the session key with the public RSA key
@@ -65,17 +62,13 @@ class rsa:
         # Encrypt the data with the AES session key
         cipher_aes = AES.new(session_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(data)
-        [ file_out.write(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
-        file_out.close()
-        return file_out.name
+        [ result_array.append(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+        return result_array
 
-    def decrypt(cipher,private_key):
-        file_in = open("./temp/encrypted_data.bin", "rb")
+    def decrypt(cipher):
+        private_key = RSA.import_key("./temp/private.pem".read())
 
-        private_key = RSA.import_key(open("./temp/private.pem").read())
-
-        enc_session_key, nonce, tag, ciphertext = \
-        [ file_in.read(x) for x in (private_key.size_in_bytes(), 16, 16, -1) ]
+        enc_session_key, nonce, tag, ciphertext = cipher
 
         # Decrypt the session key with the private RSA key
         cipher_rsa = PKCS1_OAEP.new(private_key)
@@ -86,31 +79,4 @@ class rsa:
         data = cipher_aes.decrypt_and_verify(ciphertext, tag)
         return data.decode()
     
-    # Encrypts content and send it
-    # Send data length and data
-    def sender(self,conn,data):
-        encrypted_data_file = rsa.encrypt(data.encode(),self.public_key)
-        file = open(encrypted_data_file,"rb")
-        file_array = []
-        for i in file.readlines():
-            file_array.append(i)
-        
-        file_array_string = json.dumps({"file_array":file_array})
-        conn.connection.send(str(sys.getsizeof(file_array)).encode())
-        time.sleep(0.1)
-        conn.connection.send(file_array_string.encode())
-        del file_array
-
-
-    # Receives data and decrypt it
-    # Receive data length and data
-    def receiver(self,conn):
-        data_len = conn.connection.recv(10200)
-        data_len = int(data_len.decode())
-        data = conn.connection.recv(data_len)
-        data = json.loads(data.decode())
-        file_array = data.get("file_array")
-        
-        data = rsa.decrypt(file_array,self.private_key).decode()
-        del data_len
-        return data
+    

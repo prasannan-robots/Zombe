@@ -1,4 +1,3 @@
-# Some code written by prasanna
 # Basic code written by a youtube channel guy i forgot but credits goes to him :)
 import socket
 import sys

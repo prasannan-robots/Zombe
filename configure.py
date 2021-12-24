@@ -1,4 +1,4 @@
-import rsa
+from Crypto.PublicKey import RSA
 from requests import get
 
 
@@ -90,12 +90,23 @@ def create_password():
 
 
 rrecv_password = create_password()
+
 print("Creating rsa keys ...This takes some time")
-(public_key_server, private_key_server) = rsa.newkeys(2048)
+key = RSA.generate(2048)
+private_key = key.export_key()
+file_out = open("server/temp/private.pem", "wb")
+file_out.write(private_key)
+file_out.close()
+
+public_key = key.publickey().export_key()
+file_out = open("server/temp/receiver.pem", "wb")
+file_out.write(public_key)
+file_out.close()
+
 print("Writing changes ....")
-print(type(public_key_server))
-print(public_key_server)
-key_changer_server(public_key_server,private_key_server,rrecv_password,"server/data.DAT")
-key_changer_clients(public_key_server,ip,rrecv_password,"client/.data.one")
-key_changer_clients(public_key_server,ip,rrecv_password,"sudo_controller/data.DAT")
+
+key_changer_server(rrecv_password,"server/temp/data.DAT")
+key_changer_clients(ip,rrecv_password,"client/.data.one")
+key_changer_clients(ip,rrecv_password,"sudo_controller/data.DAT")
+
 input("...Setup Done...")

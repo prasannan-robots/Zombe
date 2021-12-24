@@ -2,6 +2,7 @@
 import socket
 from modules.tools import clients,data_loader,rsa
 import os
+
 # Socket tools class which is used as an object.
 class socket_tools:
 
@@ -57,10 +58,25 @@ class socket_tools:
         object.delete_key_file()
         del self.array_of_client_objects[index_of_client_in_array_of_client_objects],object 
     
-    # Creating a proxy sender and receiver to call the one in tools.rsa
-    def sender(self,client_object,data_to_be_sent):
+    # Encrypts content and send it
+    # Send data length and data
+    def sender(self,client_object,data):
         key_path = client_object.public_key
-        rsa.sender(key_path,data_to_be_sent)
+        encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
+        encrypted_data_array = json.dumps({"result_array":encrypted_data}) # Dumping it to a json to be sent through sockets  
+        conn.connection.send(str(sys.getsizeof(encrypted_data_array)).encode())
+        time.sleep(0.1)
+        conn.connection.send(encrypted_data_array.encode())
 
-    def receiver(self,client_object):
-        return rsa.receiver(client_object)
+
+    # Receives data and decrypt it
+    # Receive data length and data
+    def receiver(self,conn):
+        data_len = conn.connection.recv(10200)
+        data_len = int(data_len.decode())
+        data = conn.connection.recv(data_len)
+        data = json.loads(data.decode())
+        result_array = data.get("result_array")
+        
+        data = rsa.decrypt(result_array).decode()
+        return data

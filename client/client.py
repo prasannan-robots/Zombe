@@ -1,10 +1,7 @@
-# Code written by prasanna
-import socket
-import os
-import subprocess
-import sys
-import time
-import rsa
+import socket,os,subprocess,sys,time
+from Crypto.PublicKey import RSA
+from Crypto.Random import get_random_bytes
+from Crypto.Cipher import AES, PKCS1_OAEP
 file_path_to_read_and_write = os.path.abspath(".data.one")
 port = 1025
 
@@ -20,10 +17,26 @@ def data_loader():
             arr.append(i)
     file.close()
     del file
-    return arr[0],arr[1],arr[2]
+    return arr[0],arr[1]
 
-(public_key, private_key) = rsa.newkeys(2048)
-public_key_server,host,recv_password = data_loader()
+try:
+    os.rmdir("temp")
+except:
+    pass
+    
+host,recv_password = data_loader()
+key = RSA.generate(1024)
+private_key = key.export_key()
+file_out = open("temp/private.pem", "wb")
+file_out.write(private_key)
+file_out.close()
+
+public_key = key.publickey().export_key()
+file_out = open("temp/receiver.pem", "wb")
+file_out.write(public_key)
+file_out.close()
+
+host,recv_password = data_loader()
 
 # Creates socket
 def create_socket():
