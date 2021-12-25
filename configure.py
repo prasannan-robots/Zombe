@@ -85,6 +85,8 @@ def create_password():
 
 try:
     shutil.rmtree("server/temp")
+    os.remove("client/.data.one")
+    os.remove("sudo_controller/data.DAT")
 except:
     pass    
 rrecv_password = create_password()

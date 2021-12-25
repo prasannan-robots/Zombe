@@ -1,7 +1,7 @@
 # need to import tools send_password and recv_password
-import socket
+import socket,os,json
 from modules.tools import clients,data_loader,rsa
-import os
+
 
 # Socket tools class which is used as an object.
 class socket_tools:
@@ -39,12 +39,13 @@ class socket_tools:
             try:
                 conn, address = self.s.accept()
                 self.s.setblocking(1)  # prevents timeout
-                public_key = rsa.receiver(conn)
-                self.sender(conn,self.recv_password)
-
+                public_key = self.receiver(conn)
                 client_obj = clients(conn,address)
                 id_for_client = id_for_client + 1
-                client_obj.save_public_key(public_key,id_for_client)
+                client_obj.save_public_key(public_key.decode(),id_for_client)
+                self.sender(client_obj,self.recv_password)
+
+                
                 self.array_of_client_objects.append(client_obj)
 
                 print("D: Connection has been established :" + address[0])
@@ -62,6 +63,7 @@ class socket_tools:
     # Send data length and data
     def sender(self,client_object,data):
         key_path = client_object.public_key
+        conn = client_object.connection
         encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
         encrypted_data_array = json.dumps({"result_array":encrypted_data}) # Dumping it to a json to be sent through sockets  
         conn.connection.send(str(sys.getsizeof(encrypted_data_array)).encode())
@@ -72,11 +74,22 @@ class socket_tools:
     # Receives data and decrypt it
     # Receive data length and data
     def receiver(self,conn):
-        data_len = conn.connection.recv(10200)
-        data_len = int(data_len.decode())
-        data = conn.connection.recv(data_len)
-        data = json.loads(data.decode())
-        result_array = data.get("result_array")
+        try:
+            data_len = conn.connection.recv(10200)
+            data_len = int(data_len.decode())
+            data = conn.connection.recv(data_len)
+            data = json.loads(data.decode())
+            result_array = data.get("result_array")
+            
+            data = rsa.decrypt(result_array).decode()
+            return data
+        except:
+            data_len = conn.recv(10200)
+            data_len = int(data_len.decode())
+            data = conn.recv(data_len)
+            data = json.loads(data.decode())
+            result_array = data.get("result_array")
+            
+            data = rsa.decrypt(result_array).decode()
+            return data
         
-        data = rsa.decrypt(result_array).decode()
-        return data

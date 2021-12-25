@@ -121,7 +121,7 @@ def send_data_target(ser):
     try:
         start_turtle(ser)
     except Exception as msg:
-        print("E: Error", msg)
+        print(f"E: Error {msg} in line 124 server.py")
 
 accept_cl = threading.Thread(target=normal_clients.accepting_connections)
 sudo_use = threading.Thread(target=sudo_user.accepting_connections)
@@ -145,4 +145,4 @@ while True:
                 data_s.daemon = True
                 data_s.start()
     except Exception as msg: 
-        print(f"E: {msg}")
+        print(f"E: {msg} in line 148 server.py")

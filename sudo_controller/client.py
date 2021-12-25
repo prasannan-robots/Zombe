@@ -1,10 +1,72 @@
-import socket,os,subprocess,sys,time,shutil
+import socket,os,subprocess,sys,time,shutil,json
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 
 file_path_to_read_and_write = os.path.abspath("data.DAT")
 port = 1026
+
+# rsa class to encrypt and decrypt data
+class rsa:
+
+    # To encrypt and decrypt using rsa opencryptdome
+    # Uses a file to save the incoming data and opening it and decrypting it
+    # All public_key of the clients are stored in file with unique no 
+    def encrypt(data,public_key):
+        result_array = [] # To store results in this array
+        key_file = open(public_key)
+        recipient_key = RSA.import_key(key_file.read())
+        key_file.close()
+        session_key = get_random_bytes(16)
+
+        # Encrypt the session key with the public RSA key
+        cipher_rsa = PKCS1_OAEP.new(recipient_key)
+        enc_session_key = cipher_rsa.encrypt(session_key)
+
+        # Encrypt the data with the AES session key
+        cipher_aes = AES.new(session_key, AES.MODE_EAX)
+        ciphertext, tag = cipher_aes.encrypt_and_digest(data)
+        [ result_array.append(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+        return result_array
+
+    def decrypt(cipher):
+        private_key = RSA.import_key("./temp/private.pem".read())
+
+        enc_session_key, nonce, tag, ciphertext = cipher
+
+        # Decrypt the session key with the private RSA key
+        cipher_rsa = PKCS1_OAEP.new(private_key)
+        session_key = cipher_rsa.decrypt(enc_session_key)
+
+        # Decrypt the data with the AES session key
+        cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+        data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+        return data.decode()
+
+# Encrypts content and send it
+# Send data length and data
+def sender(client_object,data):
+    key_path = "temp/receiver.pem"
+    encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
+    print(encrypted_data, type(encrypted_data))
+    encrypted_data_array = json.dumps({"result_array":encrypted_data}) # Dumping it to a json to be sent through sockets  
+    client_object.connection.send(str(sys.getsizeof(encrypted_data_array)).encode())
+    time.sleep(0.1)
+    client_object.connection.send(encrypted_data_array.encode())
+
+
+# Receives data and decrypt it
+# Receive data length and data
+def receiver(conn):
+    data_len = conn.connection.recv(10200)
+    data_len = int(data_len.decode())
+    data = conn.connection.recv(data_len)
+    data = json.loads(data.decode())
+    result_array = data.get("result_array")
+    
+    data = rsa.decrypt(result_array).decode()
+    return data
+
 
 # Keys and password for authentication and connection
 def data_loader():
@@ -20,49 +82,29 @@ def data_loader():
     del file
     return arr[0],arr[1]
 
-try:
-    shutil.rmtree("temp")
-except:
-    pass
-os.mkdir("temp")
-host,recv_password = data_loader()
-key = RSA.generate(1024)
-private_key = key.export_key()
-file_out = open("temp/private.pem", "wb")
-file_out.write(private_key)
-file_out.close()
+def change_key():
+    try:
+        shutil.rmtree("temp")
+    except:
+        pass
+    os.mkdir("temp")
+    key = RSA.generate(2048)
+    private_key = key.export_key()
+    file_out = open("temp/private.pem", "wb")
+    file_out.write(private_key)
+    file_out.close()
 
-public_key = key.publickey().export_key()
-file_out = open("temp/receiver.pem", "wb")
-file_out.write(public_key)
-file_out.close()
+    public_key = key.publickey().export_key()
+    file_out = open("temp/receiver.pem", "wb")
+    file_out.write(public_key)
+    file_out.close()
+    
 
 # Creates socket
 def create_socket():
     s = socket.socket()
     s.connect((host, port))
     security(s)
-
-# Encrypts content and send it
-# Send data length and data
-def sender(conn,data):
-    encrypted_data = rsa.encrypt(data.encode(),public_key_server)
-    encrypted_data_len = str(sys.getsizeof(encrypted_data.decode()))
-    encrypted_data_len = rsa.encrypt(encrypted_data_len.encode(),public_key_server)
-    conn.send(encrypted_data_len)
-    time.sleep(0.1)
-    conn.send(encrypted_data)
-
-# Receives data and decrypt it
-# Receive data length and data
-def receiver(conn):
-    data_len = conn.recv(10200)
-    data_len = int(rsa.decrypt(data_len,private_key).decode())
-    data = conn.recv(data_len)
-    data = rsa.decrypt(data,private_key).decode()
-    del data_len
-    return data
-
 
 # Process data and send the result to the server
 # input s
@@ -82,6 +124,9 @@ def deptor(s):
 
 # Security check for authentication
 def security(s):
+    key_file = open("temp/receiver.pem")
+    public_key = key_file.read()
+    key_file.close()
     sender(s,public_key)
     rec = receiver(s)
     if rec == recv_password:
@@ -91,9 +136,11 @@ def security(s):
         del s
         create_socket()
 
-
+# Start of the program
+change_key()
+host,recv_password = data_loader()
 while True:
-    try:
+    #try:
         create_socket()
-    except Exception as msf:
-        print(msf)
+    #except Exception as msf:
+        #print(msf)

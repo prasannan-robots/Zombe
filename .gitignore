@@ -7,3 +7,4 @@ testing/
 server/temp/
 *.one
 *.pem
+*.dccache
