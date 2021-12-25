@@ -9,8 +9,8 @@ import modules.socket_connection as sc
 from modules.tools import clients
 
 
-normal_clients = sc.socket_tools("0.0.0.0",1025,"data.DAT")
-sudo_user = sc.socket_tools("0.0.0.0",1026,"data.DAT")
+normal_clients = sc.socket_tools("0.0.0.0",1025,"temp/data.DAT")
+sudo_user = sc.socket_tools("0.0.0.0",1026,"temp/data.DAT")
 
 def send_data_target(ser):
     def start_turtle(ser):

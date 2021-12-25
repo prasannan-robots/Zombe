@@ -1,6 +1,9 @@
-
+server/modules/__pycache__
 *.pyc
 client/.0903e3ddsda334d3.dasd234342.;sfaf'afafaf[a]]fasd.one
 *.DAT
 env/
 testing/
+server/temp/
+*.one
+*.pem

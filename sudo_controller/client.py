@@ -1,4 +1,4 @@
-import socket,os,subprocess,sys,time
+import socket,os,subprocess,sys,time,shutil
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -21,10 +21,10 @@ def data_loader():
     return arr[0],arr[1]
 
 try:
-    os.rmdir("temp")
+    shutil.rmtree("temp")
 except:
     pass
-    
+os.mkdir("temp")
 host,recv_password = data_loader()
 key = RSA.generate(1024)
 private_key = key.export_key()

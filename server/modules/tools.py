@@ -15,7 +15,7 @@ def data_loader(file_path_to_read_and_write):
                 arr.append(i)
         file.close()
         del file
-        return arr[0],arr[1],arr[2]
+        return arr[0]
 
 # Just to create a single object instead of whole array :)
 class clients:

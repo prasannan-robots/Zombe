@@ -14,7 +14,7 @@ class socket_tools:
         self.file_path_to_read_and_write = os.path.abspath(file_path_to_read_and_write)
         self.s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.bind_socket()
-        self.public_key_server, self.private_key, self.recv_password = data_loader(file_path_to_read_and_write)
+        self.recv_password = data_loader(file_path_to_read_and_write)
         
     
     # this binds the socket
@@ -40,7 +40,7 @@ class socket_tools:
                 conn, address = self.s.accept()
                 self.s.setblocking(1)  # prevents timeout
                 public_key = rsa.receiver(conn)
-                self.sender(conn,self.send_password)
+                self.sender(conn,self.recv_password)
 
                 client_obj = clients(conn,address)
                 id_for_client = id_for_client + 1

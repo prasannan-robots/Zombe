@@ -1,5 +1,6 @@
 from Crypto.PublicKey import RSA
 from requests import get
+import shutil,os
 
 
 ip = input("Do you want to use your ip address for client connection[Y/N]:")
@@ -8,21 +9,15 @@ if 'y' in ip.lower():
 else:
     ip = input("Enter custom ip address: ")
     
-def key_changer_server(public_key_server,private_key,recv_password,file_path_to_read_and_write):
-            file=open(file_path_to_read_and_write,"wb")
-            file.write(public_key_server)
-            file.write("\n")
-            file.write(private_key)
-            file.write("\n")
+def key_changer_server(recv_password,file_path_to_read_and_write):
+            file=open(file_path_to_read_and_write,"w")
             file.write(recv_password)
             file.close()
             del file
 
-def key_changer_clients(public_key_server,host,recv_password,file_path_to_read_and_write):
+def key_changer_clients(host,recv_password,file_path_to_read_and_write):
     
-            file=open(file_path_to_read_and_write,"wb")
-            file.write(public_key_server)
-            file.write("\n")
+            file=open(file_path_to_read_and_write,"w")
             file.write(host)
             file.write("\n")
             file.write(recv_password)
@@ -88,9 +83,12 @@ def create_password():
     return password
     # print out password
 
-
+try:
+    shutil.rmtree("server/temp")
+except:
+    pass    
 rrecv_password = create_password()
-
+os.mkdir("server/temp")
 print("Creating rsa keys ...This takes some time")
 key = RSA.generate(2048)
 private_key = key.export_key()
@@ -109,4 +107,5 @@ key_changer_server(rrecv_password,"server/temp/data.DAT")
 key_changer_clients(ip,rrecv_password,"client/.data.one")
 key_changer_clients(ip,rrecv_password,"sudo_controller/data.DAT")
 
-input("...Setup Done...")
+print("...Setup Done...")
+input("Press enter to continue")
