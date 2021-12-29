@@ -1,7 +1,7 @@
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
-import sys,time,os,json
+import sys,time,os,json,shutil
 
 
 def data_loader(file_path_to_read_and_write):
@@ -29,9 +29,9 @@ class clients:
         if id == None:
             id = self.id
 
-        file = open(f"./temp/{id}.pem").write(key)
-        self.public_key = file.name
-        file.close()
+        public_key_file = open(f"./temp/client_key/{id}.pem","w").write(key)
+        self.public_key = f"./temp/client_key/{id}.pem"
+        del public_key_file
     
     def get_public_key(self):
         key = RSA.import_key(open(self.public_key).read())
@@ -58,18 +58,19 @@ class rsa:
         # Encrypt the session key with the public RSA key
         cipher_rsa = PKCS1_OAEP.new(recipient_key)
         enc_session_key = cipher_rsa.encrypt(session_key)
-
+        
         # Encrypt the data with the AES session key
         cipher_aes = AES.new(session_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(data)
-        [ result_array.append(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+        result_array = [ x for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
         return result_array
 
     def decrypt(cipher):
-        private_key = RSA.import_key("./temp/private.pem".read())
+        private_key = RSA.import_key(open("./temp/private.pem").read())
 
+        print(cipher)
         enc_session_key, nonce, tag, ciphertext = cipher
-
+        print(enc_session_key,type(enc_session_key))
         # Decrypt the session key with the private RSA key
         cipher_rsa = PKCS1_OAEP.new(private_key)
         session_key = cipher_rsa.decrypt(enc_session_key)
@@ -79,4 +80,12 @@ class rsa:
         data = cipher_aes.decrypt_and_verify(ciphertext, tag)
         return data.decode()
     
-    
+def cleanup():
+    try:
+        shutil.rmtree("temp/client_key")
+        os.mkdir("temp/client_key")
+    except:
+        try:
+            os.mkdir("temp/client_key")
+        except:
+            pass

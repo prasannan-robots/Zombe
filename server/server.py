@@ -6,7 +6,7 @@ import threading
 import time
 from queue import Queue
 import modules.socket_connection as sc
-from modules.tools import clients
+from modules.tools import clients,cleanup
 
 
 normal_clients = sc.socket_tools("0.0.0.0",1025,"temp/data.DAT")
@@ -122,7 +122,7 @@ def send_data_target(ser):
         start_turtle(ser)
     except Exception as msg:
         print(f"E: Error {msg} in line 124 server.py")
-
+cleanup()
 accept_cl = threading.Thread(target=normal_clients.accepting_connections)
 sudo_use = threading.Thread(target=sudo_user.accepting_connections)
 

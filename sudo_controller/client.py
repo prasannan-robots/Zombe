@@ -22,11 +22,12 @@ class rsa:
         # Encrypt the session key with the public RSA key
         cipher_rsa = PKCS1_OAEP.new(recipient_key)
         enc_session_key = cipher_rsa.encrypt(session_key)
-
+        
         # Encrypt the data with the AES session key
         cipher_aes = AES.new(session_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(data)
-        [ result_array.append(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+        result_array = [ x for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
+        print(result_array)
         return result_array
 
     def decrypt(cipher):
@@ -46,24 +47,24 @@ class rsa:
 # Encrypts content and send it
 # Send data length and data
 def sender(client_object,data):
-    key_path = "temp/receiver.pem"
+    key_path = "receiver.pem"
     encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
-    print(encrypted_data, type(encrypted_data))
-    encrypted_data_array = json.dumps({"result_array":encrypted_data}) # Dumping it to a json to be sent through sockets  
-    client_object.connection.send(str(sys.getsizeof(encrypted_data_array)).encode())
-    time.sleep(0.1)
-    client_object.connection.send(encrypted_data_array.encode())
+    for i in encrypted_data:
+        client_object.send(str(sys.getsizeof(i)).encode())
+        time.sleep(0.1)
+        client_object.send(i)
+        time.sleep(0.1)
 
 
 # Receives data and decrypt it
 # Receive data length and data
 def receiver(conn):
-    data_len = conn.connection.recv(10200)
-    data_len = int(data_len.decode())
-    data = conn.connection.recv(data_len)
-    data = json.loads(data.decode())
-    result_array = data.get("result_array")
-    
+    result_array = []
+    for i in range(4):
+        data_len = conn.recv(10200)
+        data_len = int(data_len.decode())
+        data = conn.recv(data_len)
+        result_array.append(data)
     data = rsa.decrypt(result_array).decode()
     return data
 
@@ -129,6 +130,7 @@ def security(s):
     key_file.close()
     sender(s,public_key)
     rec = receiver(s)
+    rec = recv_password
     if rec == recv_password:
         deptor(s)
     else:
@@ -140,7 +142,7 @@ def security(s):
 change_key()
 host,recv_password = data_loader()
 while True:
-    #try:
+    try:
         create_socket()
-    #except Exception as msf:
-        #print(msf)
+    except Exception as msf:
+        print(msf)

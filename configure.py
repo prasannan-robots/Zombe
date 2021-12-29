@@ -102,6 +102,12 @@ public_key = key.publickey().export_key()
 file_out = open("server/temp/receiver.pem", "wb")
 file_out.write(public_key)
 file_out.close()
+file_out = open("sudo_controller/receiver.pem", "wb")
+file_out.write(public_key)
+file_out.close()
+file_out = open("client/receiver.pem", "wb")
+file_out.write(public_key)
+file_out.close()
 
 print("Writing changes ....")
 

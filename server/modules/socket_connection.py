@@ -1,5 +1,5 @@
 # need to import tools send_password and recv_password
-import socket,os,json
+import socket,os,sys,time
 from modules.tools import clients,data_loader,rsa
 
 
@@ -36,22 +36,22 @@ class socket_tools:
         del self.array_of_client_objects[:]
         id_for_client = 0
         while True:
-            try:
+            #try:
                 conn, address = self.s.accept()
                 self.s.setblocking(1)  # prevents timeout
                 public_key = self.receiver(conn)
                 client_obj = clients(conn,address)
                 id_for_client = id_for_client + 1
-                client_obj.save_public_key(public_key.decode(),id_for_client)
-                self.sender(client_obj,self.recv_password)
+                client_obj.save_public_key(public_key,id_for_client)
+                #self.sender(client_obj,self.recv_password)
 
                 
                 self.array_of_client_objects.append(client_obj)
-
+                self.sender(client_obj, self.recv_password)
                 print("D: Connection has been established :" + address[0])
 
-            except Exception as msg:
-                print("E: Error accepting connections", msg)
+            #except Exception as msg:
+             #   print("E: Error accepting connections", msg)
         
     # To remove clients in easy manner
     def remove_client(self,index_of_client_in_array_of_client_objects):
@@ -65,31 +65,32 @@ class socket_tools:
         key_path = client_object.public_key
         conn = client_object.connection
         encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
-        encrypted_data_array = json.dumps({"result_array":encrypted_data}) # Dumping it to a json to be sent through sockets  
-        conn.connection.send(str(sys.getsizeof(encrypted_data_array)).encode())
-        time.sleep(0.1)
-        conn.connection.send(encrypted_data_array.encode())
+        for i in encrypted_data:
+            client_object.connection.send(str(sys.getsizeof(i)).encode())
+            time.sleep(0.1)
+            client_object.connection.send(i)
+            time.sleep(0.1)
 
 
     # Receives data and decrypt it
     # Receive data length and data
     def receiver(self,conn):
         try:
-            data_len = conn.connection.recv(10200)
-            data_len = int(data_len.decode())
-            data = conn.connection.recv(data_len)
-            data = json.loads(data.decode())
-            result_array = data.get("result_array")
-            
+            result_array = []
+            for i in range(4):
+                data_len = conn.connection.recv(10200)
+                data_len = int(data_len.decode())
+                data = conn.connection.recv(data_len)
+                result_array.append(data)
             data = rsa.decrypt(result_array).decode()
             return data
         except:
-            data_len = conn.recv(10200)
-            data_len = int(data_len.decode())
-            data = conn.recv(data_len)
-            data = json.loads(data.decode())
-            result_array = data.get("result_array")
-            
-            data = rsa.decrypt(result_array).decode()
+            result_array = []
+            for i in range(4):
+                data_len = conn.recv(10200)
+                data_len = int(data_len.decode())
+                data = conn.recv(data_len)
+                result_array.append(data)
+            data = rsa.decrypt(result_array)
             return data
         
