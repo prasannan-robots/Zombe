@@ -27,7 +27,6 @@ class rsa:
         cipher_aes = AES.new(session_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(data)
         result_array = [ x for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
-        print(result_array)
         return result_array
 
     def decrypt(cipher):
@@ -50,10 +49,11 @@ def sender(client_object,data):
     key_path = "receiver.pem"
     encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
     for i in encrypted_data:
+        print(sys.getsizeof(i))
         client_object.send(str(sys.getsizeof(i)).encode())
-        time.sleep(0.1)
+        time.sleep(0.2)
         client_object.send(i)
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 
 # Receives data and decrypt it
@@ -129,14 +129,15 @@ def security(s):
     public_key = key_file.read()
     key_file.close()
     sender(s,public_key)
-    rec = receiver(s)
-    rec = recv_password
-    if rec == recv_password:
-        deptor(s)
-    else:
-        s.close()
-        del s
-        create_socket()
+    #rec = receiver(s)
+    #print(rec)
+    #rec = recv_password
+    #if rec == recv_password:
+    deptor(s)
+    #else:
+     #   s.close()
+     #   del s
+     #   create_socket()
 
 # Start of the program
 change_key()

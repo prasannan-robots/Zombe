@@ -16,6 +16,7 @@ def send_data_target(ser):
     def start_turtle(ser):
 
         while True:
+            print("Listening")
             cmd = sudo_user.receiver(ser)
             if cmd == 'list' or cmd == 'ls':
                 list_connections(ser)
@@ -47,7 +48,7 @@ def send_data_target(ser):
 
             
             results = str(i) + "   " + str(normal_clients.array_of_client_objects[i].address) + "\n"
-        #print(results)
+        print(results)
         sudo_user.sender(ser, results)
         
 
@@ -118,10 +119,11 @@ def send_data_target(ser):
             except Exception as msg:
                 print("E: Error sending commands",msg)
                 break
-    try:
+    #try:
+        print("came here")
         start_turtle(ser)
-    except Exception as msg:
-        print(f"E: Error {msg} in line 124 server.py")
+    #except Exception as msg:
+     #   print(f"E: Error {msg} in line 124 server.py")
 cleanup()
 accept_cl = threading.Thread(target=normal_clients.accepting_connections)
 sudo_use = threading.Thread(target=sudo_user.accepting_connections)
@@ -139,10 +141,13 @@ print("D: Starting thread to create threads for sudo controllers")
 while True:
     try:
         for i in sudo_user.array_of_client_objects:
+            
             if not i in finished_conn:
                 finished_conn.append(i)
+                print(finished_conn)
                 data_s = threading.Thread(target=send_data_target,args=(i,))
                 data_s.daemon = True
                 data_s.start()
+                print("started")
     except Exception as msg: 
         print(f"E: {msg} in line 148 server.py")

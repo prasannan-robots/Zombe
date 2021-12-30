@@ -43,11 +43,8 @@ class socket_tools:
                 client_obj = clients(conn,address)
                 id_for_client = id_for_client + 1
                 client_obj.save_public_key(public_key,id_for_client)
-                #self.sender(client_obj,self.recv_password)
-
-                
+                #self.sender(client_obj,self.recv_password)                
                 self.array_of_client_objects.append(client_obj)
-                self.sender(client_obj, self.recv_password)
                 print("D: Connection has been established :" + address[0])
 
             #except Exception as msg:
@@ -62,6 +59,7 @@ class socket_tools:
     # Encrypts content and send it
     # Send data length and data
     def sender(self,client_object,data):
+        print(data)
         key_path = client_object.public_key
         conn = client_object.connection
         encrypted_data = rsa.encrypt(data.encode(),key_path) # Getting encrypted array from encrypt func
@@ -79,6 +77,7 @@ class socket_tools:
             result_array = []
             for i in range(4):
                 data_len = conn.connection.recv(10200)
+                print(data_len)
                 data_len = int(data_len.decode())
                 data = conn.connection.recv(data_len)
                 result_array.append(data)
@@ -88,6 +87,7 @@ class socket_tools:
             result_array = []
             for i in range(4):
                 data_len = conn.recv(10200)
+                print(data_len)
                 data_len = int(data_len.decode())
                 data = conn.recv(data_len)
                 result_array.append(data)

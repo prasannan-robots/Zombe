@@ -67,10 +67,7 @@ class rsa:
 
     def decrypt(cipher):
         private_key = RSA.import_key(open("./temp/private.pem").read())
-
-        print(cipher)
         enc_session_key, nonce, tag, ciphertext = cipher
-        print(enc_session_key,type(enc_session_key))
         # Decrypt the session key with the private RSA key
         cipher_rsa = PKCS1_OAEP.new(private_key)
         session_key = cipher_rsa.decrypt(enc_session_key)
